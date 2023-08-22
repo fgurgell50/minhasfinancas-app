@@ -49,8 +49,8 @@ export default props => {
                 <tr>
                     <th scope="col">Descrição</th>
                     <th scope="col">Valor</th>
-                    <th scope="col">Tipo</th>
                     <th scope="col">Mês</th>
+                    <th scope="col">Tipo</th>
                     <th scope="col">Situação</th>
                     <th scope="col">Usuário</th>
                     <th scope="col">Ações</th>

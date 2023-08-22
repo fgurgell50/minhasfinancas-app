@@ -1,7 +1,7 @@
 import React from "react";
-import axios from "axios";
 import UsuarioService from "../app/service/usuarioService";
-import LocalStorageService from "../app/service/localStorageService";
+import { AuthContext } from '../main/provedorAutenticacao'
+
 
 class Home extends React.Component{
 
@@ -15,17 +15,13 @@ class Home extends React.Component{
     }
 
     componentDidMount(){
-        //const usuarioLogadoString = localStorage.getItem('_usuario_logado')
-        //const usuarioLogado = JSON.parse(usuarioLogadoString)
+        //const usuarioLogado = LocalStorageService.obterItem( '_usuario_logado' )
+        console.error('Contexto', this.context)
+        const usuarioLogado = this.context.usuarioAutenticado
+        //console.error('Usuario Logado 2', usuarioLogado2)
+        console.error('Usuario Logado', usuarioLogado)
+        console.error('ID Usuario Logado', usuarioLogado.id)
 
-        const usuarioLogado = LocalStorageService.obterItem( '_usuario_logado' )
-        console.log('Usuario Logado no Local Storage:', usuarioLogado)
-
-        
-        //axios.get('http://localhost:8080/api/usuarios/2/saldo')
-        // `http://localhost:8080/api/usuarios/${usuarioLogado.id}/saldo`
-        // colocado dentro de crase e não apas simples para poder passar o parametro dentro
-        //axios.get(`http://localhost:8080/api/usuarios/${usuarioLogado.id}/saldo`) essa que estava funcionando
         this.usuarioService
         .obterSaldoPoUsuario(usuarioLogado.id)
         .then( response => {
@@ -35,28 +31,6 @@ class Home extends React.Component{
             //this.setState({mensagemErro: erro.response.data})
          })
     } 
-
-    /*
-    componentDidMount(){
-        const usuarioLogadoString = localStorage.getItem('_usuario_logado')
-        const usuarioLogado = JSON.parse(usuarioLogadoString)
-        console.log('Usuario Logado no Local Storage:', usuarioLogado)
-
-        axios.get(`http://localhost:8080/api/usuarios/${usuarioLogado.id}/saldo`)
-        //axios.get('http://localhost:8080/api/usuarios/${usuarioLogado.id}/saldo')
-        // `http://localhost:8080/api/usuarios/${usuarioLogado.id}/saldo`
-        // colocado dentro de crase e não apas simples para poder passar o parametro dentro
-        .then( response => {
-        this.setState({ saldo: response.data })
-         }).catch( erro => {
-            console.error(erro.response)
-            //this.setState({mensagemErro: erro.response.data})
-         })
-    } 
-    código funcinando*/
-
-
-
 
     render(){
         return(
@@ -82,4 +56,7 @@ class Home extends React.Component{
         )
     }
 }
+
+Home.contextType = AuthContext;
+
 export default Home

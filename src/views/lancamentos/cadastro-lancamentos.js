@@ -1,6 +1,7 @@
 import React from "react";
 import Card from "../../components/card";
 import FormGroup from "../../components/form-group";
+import currencyFormatter from 'currency-formatter'
 
 import { withRouter } from "react-router-dom";
 
@@ -18,14 +19,14 @@ class CadastroLancamentos extends React.Component{
     state = {
         id: null,
         descricao: '',
+        //valor: '',
         valor: '',
         mes: '',
         ano: '',
         tipo: '',
-        status: ''
-        //,
-        //usuario: null,
-        //atualizando: false
+        status: '',
+        usuario: null,
+        atualizando: false
     }
 
     constructor(){
@@ -33,28 +34,63 @@ class CadastroLancamentos extends React.Component{
         this.service = new LancamentoService();
     }
 
+    componentDidMount(){
+        //é executado depois do rebder
+        const params = this.props.match.params
+        console.log('params:',params)
+       
+        if(params.id){
+                this.service.obterPorId(params.id)
+                .then(response => { 
+                    this.setState( {...response.data, atualizando:true} ) 
+                 })
+            .catch(erros => {
+                messages.mensagemErro(erros.response.data)
+            })
+         }
+    }
+
     submit = () => {
         const usuarioLogado = LocalStorageService.obterItem('_usuario_logado')
 
         const { descricao, valor, mes, ano, tipo } = this.state;
+        //const valorNumerico = parseFloat(valor.replace('R$', '').replace(/\s+/g, '').replace(',', '.'));
+        //const valorNumerico = parseFloat(valor.replace('R$', ''));
         const lancamento = { descricao, valor, mes, ano, tipo, usuario: usuarioLogado.id };
         //qdo tem o memso nome não precisa passar decsricao: descricao, valor: valor
 
-       /*
-       try{
+        try{
             this.service.validar(lancamento)
         }catch(erro){
             const mensagens = erro.mensagens;
             mensagens.forEach(msg => messages.mensagemErro(msg));
             return false;
-        } 
-        */   
+        }     
+
 
         this.service
             .salvar(lancamento)
             .then(response => {
                 this.props.history.push('/consulta-lancamentos')
                 messages.mensagemSucesso('Lançamento cadastrado com sucesso!')
+            }).catch(error => {
+                messages.mensagemErro(error.response.data)
+            })
+    }
+
+    atualizar = () => {
+        const usuarioLogado = LocalStorageService.obterItem('_usuario_logado')
+       
+        const { descricao, valor, mes, ano, tipo, id, status, usuario } = this.state;
+        //const valorNumerico = parseFloat(valor.replace('R$', '').replace(/\s+/g, '').replace(',', '.'));
+        //const valorNumerico = parseFloat(valor.replace('R$', ''));
+        const lancamento = { descricao, valor, mes, ano, tipo, status, id, usuario };
+        //qdo tem o memso nome não precisa passar decsricao: descricao, valor: valor
+        this.service
+            .atualizar(lancamento)
+            .then(response => {
+                this.props.history.push('/consulta-lancamentos')
+                messages.mensagemSucesso('Lançamento atualizado com sucesso!')
             }).catch(error => {
                 messages.mensagemErro(error.response.data)
             })
@@ -71,9 +107,14 @@ class CadastroLancamentos extends React.Component{
 
        const  tipos = this.service.obterListaTipos();
        const  meses = this.service.obterListaMeses();
+       //const  valor  = this.state;
+       //const formattedValue = currencyFormatter.format(valor, { code: 'BRL' }); 
+       // Formata o valor para o formato BRL (Real Brasileiro)
+       const formattedValue = currencyFormatter.format(this.state.valor, { code: 'BRL' });
+
 
         return(
-            <Card>
+            <Card title = { this.state.atualizando ? 'Atualização de Lançamento' : 'Cadastro de Lançameto'}> 
                 <div className="row">
                     <div className="col-md-12">
                         <FormGroup id="inputDescricao" label="Descrição: *" >
@@ -114,6 +155,7 @@ class CadastroLancamentos extends React.Component{
                                    type="text"
                                    name="valor"
                                    value={this.state.valor}
+                                   /*value={formattedValue}*/
                                    onChange={this.handleChange} 
                                    className="form-control" />
                         </FormGroup>
@@ -143,10 +185,19 @@ class CadastroLancamentos extends React.Component{
 
                 <div className="row">
                     <div className="col-md-6">
-                        <button onClick={this.submit} 
+                    { this.state.atualizando ? 
+                            (
+                                <button onClick={this.atualizar} 
+                                        className="btn btn-success">
+                                        <i className="pi pi-refresh"></i> Atualizar
+                                </button>
+                            ) : (
+                                <button onClick={this.submit} 
                                         className="btn btn-success">
                                         <i className="pi pi-save"></i> Salvar
-                        </button>
+                                </button>
+                            )
+                        }
                         <button onClick={e => this.props.history.push('/consulta-lancamentos')} 
                                 className="btn btn-danger">
                                 <i className="pi pi-times"></i>Cancelar

@@ -11,15 +11,17 @@ import 'primereact/resources/themes/soho-light/theme.css';
 import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
 
+import ProvedorAutenticaco from './provedorAutenticacao'
+
 class App extends React.Component{
   render(){
     return(
-      <>
+      <ProvedorAutenticaco>
         <Navbar />
         <div className="container">
              <Rotas />
         </div>
-      </>
+      </ProvedorAutenticaco>
 
     )
   }

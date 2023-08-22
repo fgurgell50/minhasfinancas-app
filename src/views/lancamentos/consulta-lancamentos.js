@@ -48,6 +48,10 @@ class ConsultaLancamentos extends React.Component{
         this.service
             .consultar(lancamentoFiltro)
             .then(resposta => {
+                const lista = resposta.data
+                if( lista.lenght < 1 ){
+                    messages.mensagemAlert("Nenhum resultado encontrato")
+                }
                 console.log(resposta.data)
                 console.log(resposta.data.usuario)
                 this.setState({lancamentos: resposta.data})
@@ -61,10 +65,26 @@ class ConsultaLancamentos extends React.Component{
         this.props.history.push('/cadastro-lancamentos')
     }
 
+    alterarStatus = (lancamento, status) => {
+        this.service
+            .alterarStatus(lancamento.id, status)
+            .then( response => {
+                const lancamentos = this.state.lancamentos
+                const index = lancamentos.indexOf(lancamento)
+                if( index !== -1 ){
+                    lancamento['status'] = status // receber o novo ststus
+                    lancamentos[index] = lancamento
+                    //this.setState({ lancamento: lancamento }) assim tb funciona
+                    this.setState({lancamento})
+                }
+                messages.mensagemSucesso("Statua Atualizado com Sucesso")
+            })
 
+    }
 
     editar = (id) => {
         console.log('Editando o Lançamento',id)
+        this.props.history.push( `/cadastro-lancamentos/${id}`)
 
     }
 
@@ -165,7 +185,8 @@ class ConsultaLancamentos extends React.Component{
                         <div className="bs-compoment"></div>
                         <LancamentosTable lancamentos={this.state.lancamentos} 
                                           deleteAction={this.abrirConfirmacao}
-                                          editAction={this.editar}  />
+                                          editAction={this.editar}  
+                                          alterarStatus={this.alterarStatus}/>
                     </div>
                 </div>
 

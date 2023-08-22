@@ -1,6 +1,6 @@
 import ApiService from '../apiservice'
 
-//import ErroValidacao from '../exception/ErroValidacao'
+import ErroValidacao from '../exception/ErroValidacao'
 
 export default class LancamentoService extends ApiService {
 
@@ -34,8 +34,6 @@ export default class LancamentoService extends ApiService {
         ]
     }
 
-
-
     obterPorId(id){
         return this.get(`/${id}`);
     }
@@ -68,7 +66,7 @@ export default class LancamentoService extends ApiService {
         }
 
         if(erros && erros.length > 0){
-           // throw new ErroValidacao(erros);
+            throw new ErroValidacao(erros);
         }
     }
 

@@ -5,8 +5,9 @@ import FormGroup from "../components/form-group"
 import { withRouter } from 'react-router-dom'
 //import axios from "axios" foi retirado por causa do UsuarioService
 import UsuarioService from "../app/service/usuarioService"
-import LocalStorageService from "../app/service/localStorageService"
 import { mensagemErro } from '../components/toastr'
+
+import { AuthContext } from '../main/provedorAutenticacao'
 
 class Login extends React.Component{
 
@@ -26,8 +27,10 @@ class Login extends React.Component{
             email: this.state.email,
             senha: this.state.senha
         }).then( response => {
+            console.log('entrou', response.data)
             //localStorage.setItem('_usuario_logado', JSON.stringify(response.data))
-            LocalStorageService.adicionarItem( '_usuario_logado', response.data )
+           // LocalStorageService.adicionarItem( '_usuario_logado', response.data )
+           this.context.iniciarSessao(response.data)
             this.props.history.push('/home')
          }).catch( erro => {
             console.log('entrou no erro')
@@ -59,10 +62,6 @@ class Login extends React.Component{
              console.log(erro.response)
          }
      }*/
-
-
-
-
 
     prepareCadastar = () => {
         this.props.history.push('/cadastro-usuarios')
@@ -109,4 +108,6 @@ class Login extends React.Component{
          }
     }       
 
-export default withRouter( Login ) 
+    Login.contextType = AuthContext
+
+    export default withRouter( Login ) 
